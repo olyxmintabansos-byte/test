@@ -3,41 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Growtopia Calculator By dAbo</title>
+  <title>Growtopia Profit Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 p-6 flex justify-center">
+<body class="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 p-6 flex justify-center overflow-hidden">
   <div class="w-full max-w-xl space-y-6">
-    <h1 class="text-3xl font-bold text-center">Growtopia Calculator</h1>
+    <h1 class="text-3xl font-bold text-center">Growtopia Profit Calculator</h1>
 
     <!-- PAGE SWITCH -->
-    <div class="flex justify-center gap-2">
+    <div class="flex justify-center gap-2 relative">
       <button id="btnTM" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-900 text-white">TM Calculator</button>
       <button id="btnCloud" class="px-4 py-2 rounded-xl text-sm font-medium bg-white border">Clouds Massing</button>
+      <div id="indicator" class="absolute -bottom-2 left-0 h-1 w-1/2 bg-slate-900 rounded-full transition-transform duration-700"></div>
     </div>
 
-    <!-- TM PAGE -->
-    <div id="pageTM" class="bg-white rounded-2xl shadow-md p-6 space-y-4">
-      <h2 class="text-xl font-semibold">Tesseract Manipulator</h2>
-      <div>
-        <label class="block text-sm font-medium mb-1">Jumlah Block yang di-break</label>
-        <input id="blocks" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="contoh: 5000" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">Hit per 1 Block</label>
-        <input id="hitsPerBlock" type="number" class="w-full rounded-xl border px-4 py-2" value="3" />
+    <!-- PAGES WRAPPER (SLIDE) -->
+    <div class="relative overflow-hidden rounded-2xl shadow-lg bg-white">
+      <div id="slider" class="flex transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] w-full">
+        <!-- TM PAGE -->
+        <div class="min-w-full p-6 space-y-4">
+          <h2 class="text-xl font-semibold">Tesseract Manipulator</h2>
+          <div>
+            <label class="block text-sm font-medium mb-1">Jumlah Block yang di-break</label>
+            <input id="blocks" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="contoh: 5000" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Hit per 1 Block</label>
+            <input id="hitsPerBlock" type="number" class="w-full rounded-xl border px-4 py-2" value="3" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Jumlah TM</label>
+            <input id="tmCount" type="number" min="1" value="1" class="w-full rounded-xl border px-4 py-2" />
+          </div>
+        </div>
+
+        <!-- CLOUD PAGE -->
+        <div class="min-w-full p-6 space-y-4">
+          <h2 class="text-xl font-semibold">Target Massing Clouds</h2>
+          <div>
+            <label class="block text-sm font-medium mb-1">Target Clouds Tree</label>
+            <input id="targetClouds" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="contoh: 200" />
+          </div>
+          <div id="cloudResult" class="space-y-2 text-sm hidden"></div>
+        </div>
       </div>
     </div>
 
-    <!-- CLOUD PAGE -->
-    <div id="pageCloud" class="bg-white rounded-2xl shadow-md p-6 space-y-4 hidden">
-      <h2 class="text-xl font-semibold">Target Massing Clouds</h2>
-      <div>
-        <label class="block text-sm font-medium mb-1">Target Clouds Tree</label>
-        <input id="targetClouds" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="contoh: 200" />
-      </div>
-      <div id="cloudResult" class="space-y-2 text-sm hidden"></div>
-    </div>
+    <!-- RESULT -->
+    <style>
+      /* FEEL LIKE IMAGE SLIDER */
+      #slider > div {
+        background: white;
+      }
+    </style>
 
     <!-- RESULT -->
     <div class="bg-white rounded-2xl shadow-md p-6 space-y-3">
@@ -68,6 +86,7 @@
   const blocks = document.getElementById('blocks');
   const hitsPerBlock = document.getElementById('hitsPerBlock');
   const targetClouds = document.getElementById('targetClouds');
+  const tmCount = document.getElementById('tmCount');
 
   const rHits = document.getElementById('rHits');
   const rGems = document.getElementById('rGems');
@@ -75,21 +94,25 @@
   const rWL = document.getElementById('rWL');
 
   const cloudResult = document.getElementById('cloudResult');
+  const slider = document.getElementById('slider');
+  const indicator = document.getElementById('indicator');
+  const btnTM = document.getElementById('btnTM');
+  const btnCloud = document.getElementById('btnCloud');
 
-  // PAGE SWITCH
+  // PAGE SWITCH (SLIDE)
   btnTM.onclick = () => {
-    pageTM.classList.remove('hidden');
-    pageCloud.classList.add('hidden');
+    slider.style.transform = 'translateX(0%)';
+    indicator.style.transform = 'translateX(0%)';
     btnTM.className = 'px-4 py-2 rounded-xl text-sm font-medium bg-slate-900 text-white';
     btnCloud.className = 'px-4 py-2 rounded-xl text-sm font-medium bg-white border';
-  }
+  };
 
   btnCloud.onclick = () => {
-    pageCloud.classList.remove('hidden');
-    pageTM.classList.add('hidden');
+    slider.style.transform = 'translateX(-100%)';
+    indicator.style.transform = 'translateX(100%)';
     btnCloud.className = 'px-4 py-2 rounded-xl text-sm font-medium bg-slate-900 text-white';
     btnTM.className = 'px-4 py-2 rounded-xl text-sm font-medium bg-white border';
-  }
+  };
 
   function updateTM() {
     const b = Number(blocks.value || 0);
@@ -97,7 +120,8 @@
     const hits = b * hpb;
     const gems = hits * GEM_PER_HIT;
     const wl = gems / GEM_PER_WL;
-    const time = hits * TIME_PER_HIT;
+    const tm = Math.max(1, Number(tmCount.value || 1));
+    const time = (hits * TIME_PER_HIT) / tm;
 
     const hrs = Math.floor(time / 3600);
     const mins = Math.floor((time % 3600) / 60);
@@ -132,9 +156,9 @@
   }
 
   blocks.oninput = updateTM;
+  tmCount.oninput = updateTM;
   hitsPerBlock.oninput = () => { updateTM(); updateCloud(); };
   targetClouds.oninput = updateCloud;
 </script>
 </body>
 </html>
-
