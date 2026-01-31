@@ -1,141 +1,151 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Growtopia Calculator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GT Tools</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="h-screen bg-slate-950 text-slate-100 flex overflow-hidden">
+<body class="h-screen flex bg-[#111114] text-zinc-200 overflow-hidden">
 
-  <!-- SIDEBAR -->
-  <aside id="sidebar"
-    class="bg-slate-900 border-r border-slate-800 transition-all duration-300
-           w-14 flex flex-col">
+<!-- SIDEBAR -->
+<aside id="sidebar"
+  class="bg-[#17171c] border-r border-zinc-800 transition-all duration-300 w-14 flex flex-col">
 
-    <!-- TOGGLE -->
-    <button id="menuToggle"
-      class="h-14 flex items-center justify-center hover:bg-slate-800 transition">
-      <div class="space-y-1">
-        <span class="block w-5 h-0.5 bg-sky-400"></span>
-        <span class="block w-5 h-0.5 bg-sky-400"></span>
-        <span class="block w-5 h-0.5 bg-sky-400"></span>
-      </div>
+  <button id="menuToggle"
+    class="h-14 flex items-center justify-center hover:bg-zinc-800 transition">
+    <div class="space-y-1">
+      <span class="block w-5 h-0.5 bg-indigo-400"></span>
+      <span class="block w-5 h-0.5 bg-rose-400"></span>
+      <span class="block w-5 h-0.5 bg-indigo-400"></span>
+    </div>
+  </button>
+
+  <nav id="menu" class="hidden px-2 mt-3 space-y-1">
+    <button data-page="home" class="menu-btn w-full px-3 py-2 rounded-md hover:bg-zinc-800">
+      Home
+    </button>
+    <button data-page="tm" class="menu-btn w-full px-3 py-2 rounded-md hover:bg-zinc-800">
+      TM Calculator
+    </button>
+    <button data-page="cloud" class="menu-btn w-full px-3 py-2 rounded-md hover:bg-zinc-800">
+      Clouds Massing
+    </button>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="flex-1 p-8 overflow-y-auto">
+
+<!-- HOME -->
+<section id="pageHome" class="page">
+  <h1 class="text-3xl font-semibold mb-2">GT Utility Tools</h1>
+  <p class="text-zinc-400 max-w-xl mb-8">
+    Simple calculator untuk Growtopia. Cepat, ringan, dan fokus ke fungsi.
+  </p>
+
+  <div class="flex gap-4">
+    <button id="goTM"
+      class="px-5 py-3 rounded-xl bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/25 transition">
+      TM Calculator
     </button>
 
-    <!-- MENU -->
-    <nav id="menu" class="flex-1 px-2 mt-3 space-y-1 hidden">
-      <button data-page="home" class="menu-btn w-full px-3 py-2 rounded-md text-left hover:bg-slate-800 transition">
-        Home
-      </button>
-      <button data-page="tm" class="menu-btn w-full px-3 py-2 rounded-md text-left hover:bg-slate-800 transition">
-        TM Calculator
-      </button>
-      <button data-page="cloud" class="menu-btn w-full px-3 py-2 rounded-md text-left hover:bg-slate-800 transition">
-        Clouds Massing
-      </button>
-    </nav>
-  </aside>
+    <button id="goCloud"
+      class="px-5 py-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 hover:bg-rose-500/25 transition">
+      Clouds Massing
+    </button>
+  </div>
+</section>
 
-  <!-- MAIN -->
-  <main class="flex-1 p-8 relative overflow-y-auto">
+<!-- TM CALC -->
+<section id="pageTM" class="page hidden opacity-0 transition">
+  <h1 class="text-2xl font-semibold mb-4">TM Calculator</h1>
 
-    <!-- HOME -->
-    <section id="pageHome" class="page transition-opacity duration-200">
-      <h1 class="text-3xl font-semibold mb-3">Growtopia Calculator</h1>
-      <p class="text-slate-400 max-w-xl mb-8">
-        Tool sederhana untuk menghitung kebutuhan TM dan Massing Clouds
-        secara cepat dan efisien.
-      </p>
+  <div class="bg-[#17171c] border border-zinc-800 rounded-xl p-6 max-w-md">
+    <label class="block text-sm text-zinc-400 mb-2">Jumlah Tree</label>
+    <input id="tmTree" type="number"
+      class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 mb-4">
 
-      <div class="flex gap-4">
-        <button id="goTM"
-          class="px-5 py-3 rounded-xl bg-sky-500/10 border border-sky-500/30
-                 hover:bg-sky-500/20 transition text-sky-400">
-          Buka TM Calculator
-        </button>
+    <button id="tmCalc"
+      class="w-full py-2 rounded-lg bg-indigo-600/30 text-indigo-300 hover:bg-indigo-600/40 transition">
+      Hitung
+    </button>
 
-        <button id="goCloud"
-          class="px-5 py-3 rounded-xl bg-sky-500/10 border border-sky-500/30
-                 hover:bg-sky-500/20 transition text-sky-400">
-          Buka Clouds Massing
-        </button>
-      </div>
-    </section>
+    <p id="tmResult" class="mt-4 text-zinc-300"></p>
+  </div>
+</section>
 
-    <!-- TM -->
-    <section id="pageTM" class="page hidden opacity-0 transition-opacity duration-200">
-      <h1 class="text-2xl font-semibold mb-4">TM Calculator</h1>
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 text-slate-400">
-        (TM calculator nanti ditaruh di sini)
-      </div>
-    </section>
+<!-- CLOUD -->
+<section id="pageCloud" class="page hidden opacity-0 transition">
+  <h1 class="text-2xl font-semibold mb-4">Clouds Massing</h1>
 
-    <!-- CLOUD -->
-    <section id="pageCloud" class="page hidden opacity-0 transition-opacity duration-200">
-      <h1 class="text-2xl font-semibold mb-4">Clouds Massing</h1>
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 text-slate-400">
-        (Clouds calculator nanti ditaruh di sini)
-      </div>
-    </section>
+  <div class="bg-[#17171c] border border-zinc-800 rounded-xl p-6 max-w-md">
+    <label class="block text-sm text-zinc-400 mb-2">Jumlah Tree</label>
+    <input id="cloudTree" type="number"
+      class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 mb-4">
 
-  </main>
+    <button id="cloudCalc"
+      class="w-full py-2 rounded-lg bg-rose-600/30 text-rose-300 hover:bg-rose-600/40 transition">
+      Hitung
+    </button>
+
+    <p id="cloudResult" class="mt-4 text-zinc-300"></p>
+  </div>
+</section>
+
+</main>
 
 <script>
-  const sidebar = document.getElementById('sidebar');
-  const menuToggle = document.getElementById('menuToggle');
-  const menu = document.getElementById('menu');
-  const menuBtns = document.querySelectorAll('.menu-btn');
+const sidebar = document.getElementById('sidebar');
+const menuToggle = document.getElementById('menuToggle');
+const menu = document.getElementById('menu');
+const menuBtns = document.querySelectorAll('.menu-btn');
 
-  const pages = {
-    home: document.getElementById('pageHome'),
-    tm: document.getElementById('pageTM'),
-    cloud: document.getElementById('pageCloud')
-  };
+const pages = {
+  home: pageHome,
+  tm: pageTM,
+  cloud: pageCloud
+};
 
-  const goTM = document.getElementById('goTM');
-  const goCloud = document.getElementById('goCloud');
+let open = false;
+let active = 'home';
 
-  let sidebarOpen = false;
-  let activePage = 'home';
+menuToggle.onclick = () => {
+  open = !open;
+  sidebar.classList.toggle('w-14', !open);
+  sidebar.classList.toggle('w-52', open);
+  menu.classList.toggle('hidden', !open);
+};
 
-  function switchPage(page) {
-    if (page === activePage) return;
+function switchPage(p) {
+  if (p === active) return;
+  pages[active].classList.add('opacity-0');
+  setTimeout(() => {
+    pages[active].classList.add('hidden');
+    pages[p].classList.remove('hidden');
+    requestAnimationFrame(() => pages[p].classList.remove('opacity-0'));
+    active = p;
+  }, 150);
+}
 
-    menuBtns.forEach(b => b.classList.remove('bg-slate-800', 'text-sky-400'));
-    document.querySelector(`[data-page="${page}"]`)
-      ?.classList.add('bg-slate-800', 'text-sky-400');
+menuBtns.forEach(b => b.onclick = () => switchPage(b.dataset.page));
+goTM.onclick = () => { if (!open) menuToggle.click(); switchPage('tm'); };
+goCloud.onclick = () => { if (!open) menuToggle.click(); switchPage('cloud'); };
 
-    pages[activePage].classList.add('opacity-0');
-    setTimeout(() => {
-      pages[activePage].classList.add('hidden');
-      pages[page].classList.remove('hidden');
-      requestAnimationFrame(() => pages[page].classList.remove('opacity-0'));
-      activePage = page;
-    }, 150);
-  }
+// TM LOGIC
+tmCalc.onclick = () => {
+  const tree = Number(tmTree.value || 0);
+  const block = tree * 4;
+  tmResult.textContent = `≈ ${block.toLocaleString()} Block`;
+};
 
-  menuToggle.onclick = () => {
-    sidebarOpen = !sidebarOpen;
-    sidebar.classList.toggle('w-14', !sidebarOpen);
-    sidebar.classList.toggle('w-52', sidebarOpen);
-    menu.classList.toggle('hidden', !sidebarOpen);
-  };
-
-  menuBtns.forEach(btn => {
-    btn.onclick = () => switchPage(btn.dataset.page);
-  });
-
-  goTM.onclick = () => {
-    if (!sidebarOpen) menuToggle.click();
-    switchPage('tm');
-  };
-
-  goCloud.onclick = () => {
-    if (!sidebarOpen) menuToggle.click();
-    switchPage('cloud');
-  };
+// CLOUD LOGIC
+cloudCalc.onclick = () => {
+  const tree = Number(cloudTree.value || 0);
+  const block = tree * 2.5;
+  cloudResult.textContent = `≈ ${block.toLocaleString()} Cloud Block`;
+};
 </script>
 
 </body>
