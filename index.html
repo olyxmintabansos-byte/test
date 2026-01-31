@@ -1,1 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GT Premium Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:Poppins,sans-serif}
+body{margin:0;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:30px}
+h1{text-align:center;margin-bottom:30px}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{backdrop-filter:blur(20px);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+border-radius:24px;padding:24px;box-shadow:0 0 40px rgba(0,0,0,.3);transition:.3s}
+.card:hover{transform:translateY(-4px)}
+.title{font-size:18px;font-weight:600}
+.sub{font-size:12px;color:#94a3b8;margin-bottom:16px}
+input{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);
+background:rgba(0,0,0,0.4);color:white;margin-bottom:12px}
+.result{background:rgba(0,0,0,0.4);padding:14px;border-radius:14px;margin-top:10px;font-size:14px}
+.stat{display:flex;justify-content:space-between;margin-bottom:6px}
+.highlight{color:#38bdf8;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>GT Premium Calculator</h1>
+
+<div class="grid">
+
+<div class="card">
+<div class="title">Tesseract Manipulator</div>
+<div class="sub">Hitung waktu & cost farming</div>
+<input type="number" id="tmBlocks" value="5000" placeholder="Total Blocks">
+<input type="number" id="tmHits" value="3" placeholder="Hits per Block">
+<input type="number" id="tmCount" value="1" placeholder="Jumlah TM">
+
+<div class="result">
+<div class="stat"><span>Total Hits</span><span id="tmHitsTotal" class="highlight"></span></div>
+<div class="stat"><span>Gems</span><span id="tmGems" class="highlight"></span></div>
+<div class="stat"><span>Time</span><span id="tmTime" class="highlight"></span></div>
+<div class="stat"><span>Cost WL</span><span id="tmWL" class="highlight"></span></div>
+</div>
+</div>
+
+<div class="card">
+<div class="title">Cloud Massing</div>
+<div class="sub">Estimasi Dreamstone & Cost</div>
+<input type="number" id="clouds" value="200" placeholder="Target Cloud Trees">
+
+<div class="result">
+<div class="stat"><span>Dreamstone Blocks</span><span id="dream" class="highlight"></span></div>
+<div class="stat"><span>Total Hits</span><span id="cloudHits" class="highlight"></span></div>
+<div class="stat"><span>Cost WL</span><span id="cloudWL" class="highlight"></span></div>
+</div>
+</div>
+
+</div>
+
+<script>
+const GEM_PER_HIT=1, TIME_PER_HIT=1.5, GEM_PER_WL=200, CLOUDSTONE_SEED_PER_200=145;
+const CLOUD_HITS_PER_BLOCK=3; // FIXED
+
+function fmt(n){return n.toLocaleString('id-ID')}
+
+function update(){
+
+ // ===== TM CALC =====
+let blocks=parseInput(tmBlocks.value);
+let hitsBlock=parseInput(tmHits.value);
+let tm=parseInput(tmCount.value) || 1;
+
+ let totalHits=blocks*hitsBlock;
+ let totalGems=totalHits*GEM_PER_HIT;
+ let wlCost=Math.floor(totalGems/GEM_PER_WL);
+ let timeSec=(totalHits*TIME_PER_HIT)/tm;
+
+ let h=Math.floor(timeSec/3600);
+ let m=Math.floor((timeSec%3600)/60);
+ let s=Math.floor(timeSec%60);
+
+ tmHitsTotal.textContent=fmt(totalHits);
+ tmGems.textContent=fmt(totalGems);
+ tmWL.textContent=fmt(wlCost)+" WL";
+ tmTime.textContent=`${h}j ${m}m ${s}d`;
+
+ // ===== CLOUD CALC =====
+ let target=parseInput(clouds.value);
+ let trees=Math.ceil((target/CLOUDSTONE_SEED_PER_200)*200);
+ let dreamBlocks=trees*4;
+ let cloudTotalHits=dreamBlocks*CLOUD_HITS_PER_BLOCK;
+ let cloudWlCost=Math.floor((cloudTotalHits*GEM_PER_HIT)/GEM_PER_WL);
+
+ dream.textContent=fmt(dreamBlocks);
+ cloudHits.textContent=fmt(cloudTotalHits);
+ cloudWL.textContent=fmt(cloudWlCost)+" WL";
+}
+
+function parseInput(val){
+  val = val.toLowerCase().replace(/\./g,'').trim()
+
+  if(val.endsWith('k')) return parseFloat(val)*1000
+  if(val.endsWith('m')) return parseFloat(val)*1000000
+
+  return parseFloat(val) || 0
+}
+
+function formatInput(el){
+  let raw = parseInput(el.value)
+  if(!isNaN(raw) && raw>0){
+    el.value = raw.toLocaleString('id-ID')
+  }
+}
+
+document.querySelectorAll("input").forEach(input=>{
+  input.addEventListener("blur", e=>{
+    formatInput(e.target)
+    update()
+  })
+
+  input.addEventListener("focus", e=>{
+    e.target.value = e.target.value.replace(/\./g,'')
+  })
+
+  input.addEventListener("input", update)
+})
+
+</script>
+
+</body>
+</html>
+
 
