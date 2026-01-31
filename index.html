@@ -1,396 +1,131 @@
-import { useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowLeftRight,
-  Calculator,
-  CircleHelp,
-  Gem,
-  Sparkles,
-  Wallet,
-  Pickaxe,
-  Box,
-  TrendingUp,
-  Coins,
-  ArrowRight
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GT Premium Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:Poppins,sans-serif}
+body{margin:0;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:30px}
+h1{text-align:center;margin-bottom:30px}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{backdrop-filter:blur(20px);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+border-radius:24px;padding:24px;box-shadow:0 0 40px rgba(0,0,0,.3);transition:.3s}
+.card:hover{transform:translateY(-4px)}
+.title{font-size:18px;font-weight:600}
+.sub{font-size:12px;color:#94a3b8;margin-bottom:16px}
+input{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);
+background:rgba(0,0,0,0.4);color:white;margin-bottom:12px}
+.result{background:rgba(0,0,0,0.4);padding:14px;border-radius:14px;margin-top:10px;font-size:14px}
+.stat{display:flex;justify-content:space-between;margin-bottom:6px}
+.highlight{color:#38bdf8;font-weight:600}
+</style>
+</head>
+<body>
 
-function clampNumber(n: number, min: number, max: number) {
-  if (Number.isNaN(n)) return min;
-  return Math.min(max, Math.max(min, n));
+<h1>GT Premium Calculator</h1>
+
+<div class="grid">
+
+<div class="card">
+<div class="title">Tesseract Manipulator</div>
+<div class="sub">Hitung waktu & cost farming</div>
+<input type="number" id="tmBlocks" value="5000" placeholder="Total Blocks">
+<input type="number" id="tmHits" value="3" placeholder="Hits per Block">
+<input type="number" id="tmCount" value="1" placeholder="Jumlah TM">
+
+<div class="result">
+<div class="stat"><span>Total Hits</span><span id="tmHitsTotal" class="highlight"></span></div>
+<div class="stat"><span>Gems</span><span id="tmGems" class="highlight"></span></div>
+<div class="stat"><span>Time</span><span id="tmTime" class="highlight"></span></div>
+<div class="stat"><span>Cost WL</span><span id="tmWL" class="highlight"></span></div>
+</div>
+</div>
+
+<div class="card">
+<div class="title">Cloud Massing</div>
+<div class="sub">Estimasi Dreamstone & Cost</div>
+<input type="number" id="clouds" value="200" placeholder="Target Cloud Trees">
+
+<div class="result">
+<div class="stat"><span>Dreamstone Blocks</span><span id="dream" class="highlight"></span></div>
+<div class="stat"><span>Total Hits</span><span id="cloudHits" class="highlight"></span></div>
+<div class="stat"><span>Cost WL</span><span id="cloudWL" class="highlight"></span></div>
+</div>
+</div>
+
+</div>
+
+<script>
+const GEM_PER_HIT=1, TIME_PER_HIT=1.5, GEM_PER_WL=200, CLOUDSTONE_SEED_PER_200=145;
+const CLOUD_HITS_PER_BLOCK=3; // FIXED
+
+function fmt(n){return n.toLocaleString('id-ID')}
+
+function update(){
+
+ // ===== TM CALC =====
+let blocks=parseInput(tmBlocks.value);
+let hitsBlock=parseInput(tmHits.value);
+let tm=parseInput(tmCount.value) || 1;
+
+ let totalHits=blocks*hitsBlock;
+ let totalGems=totalHits*GEM_PER_HIT;
+ let wlCost=Math.floor(totalGems/GEM_PER_WL);
+ let timeSec=(totalHits*TIME_PER_HIT)/tm;
+
+ let h=Math.floor(timeSec/3600);
+ let m=Math.floor((timeSec%3600)/60);
+ let s=Math.floor(timeSec%60);
+
+ tmHitsTotal.textContent=fmt(totalHits);
+ tmGems.textContent=fmt(totalGems);
+ tmWL.textContent=fmt(wlCost)+" WL";
+ tmTime.textContent=`${h}j ${m}m ${s}d`;
+
+ // ===== CLOUD CALC =====
+ let target=parseInput(clouds.value);
+ let trees=Math.ceil((target/CLOUDSTONE_SEED_PER_200)*200);
+ let dreamBlocks=trees*4;
+ let cloudTotalHits=dreamBlocks*CLOUD_HITS_PER_BLOCK;
+ let cloudWlCost=Math.floor((cloudTotalHits*GEM_PER_HIT)/GEM_PER_WL);
+
+ dream.textContent=fmt(dreamBlocks);
+ cloudHits.textContent=fmt(cloudTotalHits);
+ cloudWL.textContent=fmt(cloudWlCost)+" WL";
 }
 
-function formatInt(n: number) {
-  const safe = Number.isFinite(n) ? Math.trunc(n) : 0;
-  return new Intl.NumberFormat("id-ID").format(safe);
+function parseInput(val){
+  val = val.toLowerCase().replace(/\./g,'').trim()
+
+  if(val.endsWith('k')) return parseFloat(val)*1000
+  if(val.endsWith('m')) return parseFloat(val)*1000000
+
+  return parseFloat(val) || 0
 }
 
-function formatPct(n: number) {
-  const safe = Number.isFinite(n) ? n : 0;
-  return `${safe.toFixed(2)}%`;
+function formatInput(el){
+  let raw = parseInput(el.value)
+  if(!isNaN(raw) && raw>0){
+    el.value = raw.toLocaleString('id-ID')
+  }
 }
 
-function StatChip(props: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  testId: string;
-  accent?: "primary" | "accent";
-}) {
-  const { icon, label, value, testId, accent = "primary" } = props;
-  const ring =
-    accent === "accent"
-      ? "ring-1 ring-[hsl(var(--accent)/0.25)]"
-      : "ring-1 ring-[hsl(var(--primary)/0.25)]";
+document.querySelectorAll("input").forEach(input=>{
+  input.addEventListener("blur", e=>{
+    formatInput(e.target)
+    update()
+  })
 
-  return (
-    <div
-      className={`chip ring-glow ${ring} rounded-xl px-4 py-3`}
-      data-testid={testId}
-    >
-      <div className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
-        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-black/30 text-[hsl(var(--foreground))]">
-          {icon}
-        </span>
-        <span>{label}</span>
-      </div>
-      <div className="mt-1 font-display text-lg tracking-wide text-glow">
-        {value}
-      </div>
-    </div>
-  );
-}
+  input.addEventListener("focus", e=>{
+    e.target.value = e.target.value.replace(/\./g,'')
+  })
 
-function FieldRow(props: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-  testId: string;
-}) {
-  const { label, hint, children, testId } = props;
-  return (
-    <div className="space-y-2" data-testid={testId}>
-      <div className="flex items-center justify-between gap-3">
-        <Label className="text-sm text-[hsl(var(--foreground))]" data-testid={`${testId}-label`}>
-          {label}
-        </Label>
-        {hint ? (
-          <span
-            className="text-xs text-[hsl(var(--muted-foreground))]"
-            data-testid={`${testId}-hint`}
-          >
-            {hint}
-          </span>
-        ) : null}
-      </div>
-      {children}
-    </div>
-  );
-}
+  input.addEventListener("input", update)
+})
 
-function Panel(props: { title: string; subtitle: string; children: React.ReactNode; testId: string }) {
-  const { title, subtitle, children, testId } = props;
-  return (
-    <Card className="glass grid-noise overflow-hidden rounded-2xl" data-testid={testId}>
-      <div className="p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div
-              className="font-display text-base tracking-wide text-[hsl(var(--foreground))]"
-              data-testid={`${testId}-title`}
-            >
-              {title}
-            </div>
-            <div
-              className="mt-1 text-sm text-[hsl(var(--muted-foreground))]"
-              data-testid={`${testId}-subtitle`}
-            >
-              {subtitle}
-            </div>
-          </div>
-          <Badge
-            variant="secondary"
-            className="rounded-full bg-white/5 text-[hsl(var(--muted-foreground))]"
-            data-testid={`${testId}-badge`}
-          >
-            live
-          </Badge>
-        </div>
+</script>
 
-        <div className="mt-5">{children}</div>
-      </div>
-    </Card>
-  );
-}
-
-export default function GrowtopiaCalculatorPage() {
-  const [wl, setWl] = useState<number>(0);
-  const [rateWlPerDl, setRateWlPerDl] = useState<number>(100);
-  const [dl, setDl] = useState<number>(0);
-
-  const [cost, setCost] = useState<number>(0);
-  const [sell, setSell] = useState<number>(0);
-
-  // Farming state
-  const [treeAmount, setTreeAmount] = useState<number>(1000);
-  const [avgBlocksPerTree, setAvgBlocksPerTree] = useState<number>(4);
-  const [avgSeedsPerBlock, setAvgSeedsPerBlock] = useState<number>(0.25);
-
-  // Pack state
-  const [gemsAmount, setGemsAmount] = useState<number>(100000);
-  const [packPrice, setPackPrice] = useState<number>(500);
-  const [sellRate, setSellRate] = useState<number>(10); // per WL
-
-  const farmingResult = useMemo(() => {
-    const totalBlocks = treeAmount * avgBlocksPerTree;
-    const totalSeeds = totalBlocks * avgSeedsPerBlock;
-    const gemsFromBlocks = totalBlocks * 10; // Simple estimate: 10 gems per block
-    return { totalBlocks, totalSeeds, gemsFromBlocks };
-  }, [treeAmount, avgBlocksPerTree, avgSeedsPerBlock]);
-
-  const packResult = useMemo(() => {
-    const totalPacks = Math.floor(gemsAmount / packPrice);
-    const wlReturn = Math.floor(totalPacks / sellRate);
-    return { totalPacks, wlReturn };
-  }, [gemsAmount, packPrice, sellRate]);
-
-  const derived = useMemo(() => {
-    const rate = clampNumber(rateWlPerDl, 1, 1000000);
-    const wlToDl = wl / rate;
-    const dlToWl = dl * rate;
-    const profit = sell - cost;
-    const roi = cost > 0 ? (profit / cost) * 100 : 0;
-
-    return {
-      rate,
-      wlToDl,
-      dlToWl,
-      profit,
-      roi,
-    };
-  }, [wl, dl, rateWlPerDl, cost, sell]);
-
-  const profitTone = derived.profit >= 0 ? "text-[hsl(var(--primary))]" : "text-red-400";
-
-  return (
-    <div className="app-shell">
-      <div className="mx-auto w-full max-w-6xl px-4 pb-14 pt-10 sm:px-6 sm:pt-14">
-        <motion.header
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
-          data-testid="section-header"
-        >
-          <div>
-            <div className="inline-flex items-center gap-2" data-testid="row-title">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10" data-testid="icon-app">
-                <Calculator className="h-5 w-5 text-[hsl(var(--foreground))]" />
-              </span>
-              <h1
-                className="font-display text-3xl tracking-wide text-glow sm:text-4xl"
-                data-testid="text-app-title"
-              >
-                Growtopia Toolset
-              </h1>
-            </div>
-            <p
-              className="mt-2 max-w-2xl text-sm text-[hsl(var(--muted-foreground))] sm:text-base"
-              data-testid="text-app-subtitle"
-            >
-              Inspirasi dari aplikasi Play Store. Hitung Farming, Packs, dan Konversi Ekonomi dalam satu dashboard.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2" data-testid="row-header-actions">
-            <Button
-              className="rounded-xl"
-              data-testid="button-reset"
-              onClick={() => {
-                setWl(0);
-                setDl(0);
-                setRateWlPerDl(100);
-                setCost(0);
-                setSell(0);
-                setTreeAmount(1000);
-                setGemsAmount(100000);
-              }}
-            >
-              Reset Semua
-            </Button>
-          </div>
-        </motion.header>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-2" data-testid="grid-panels">
-          {/* Conversion Panel */}
-          <Panel
-            title="Ekonimi & Konversi"
-            subtitle="WL ⇄ DL & Profit Calculator cepat."
-            testId="panel-economy"
-          >
-            <Tabs defaultValue="convert" className="w-full">
-              <TabsList className="w-full rounded-xl bg-white/5 p-1">
-                <TabsTrigger value="convert" className="flex-1 rounded-lg">Konversi</TabsTrigger>
-                <TabsTrigger value="profit" className="flex-1 rounded-lg">Profit</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="convert" className="mt-4 space-y-4">
-                <FieldRow label="Rate (WL/DL)" testId="field-rate">
-                  <Input type="number" value={rateWlPerDl} onChange={(e) => setRateWlPerDl(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" />
-                </FieldRow>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <FieldRow label="WL" testId="field-wl"><Input type="number" value={wl} onChange={(e) => setWl(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" /></FieldRow>
-                  <FieldRow label="DL" testId="field-dl"><Input type="number" value={dl} onChange={(e) => setDl(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" /></FieldRow>
-                </div>
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="glass rounded-xl p-3">
-                    <div className="text-[10px] uppercase text-muted-foreground">DL Result</div>
-                    <div className="font-display text-xl">{derived.wlToDl.toFixed(2)}</div>
-                  </div>
-                  <div className="glass rounded-xl p-3">
-                    <div className="text-[10px] uppercase text-muted-foreground">WL Result</div>
-                    <div className="font-display text-xl">{formatInt(derived.dlToWl)}</div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="profit" className="mt-4 space-y-4">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <FieldRow label="Beli (WL)" testId="field-cost"><Input type="number" value={cost} onChange={(e) => setCost(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" /></FieldRow>
-                  <FieldRow label="Jual (WL)" testId="field-sell"><Input type="number" value={sell} onChange={(e) => setSell(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" /></FieldRow>
-                </div>
-                <div className="glass rounded-xl p-4 flex justify-between items-center">
-                   <div>
-                     <div className="text-xs text-muted-foreground">Net Profit</div>
-                     <div className={`font-display text-2xl ${profitTone}`}>{formatInt(derived.profit)} WL</div>
-                   </div>
-                   <div className="text-right">
-                     <div className="text-xs text-muted-foreground">ROI</div>
-                     <div className="font-display text-xl">{formatPct(derived.roi)}</div>
-                   </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </Panel>
-
-          {/* Farming Panel */}
-          <Panel
-            title="Farming Simulator"
-            subtitle="Estimasi harvest: blok, seed, dan gems."
-            testId="panel-farming"
-          >
-            <div className="space-y-4">
-              <FieldRow label="Jumlah Pohon" hint="Misal: 1 Farm (2600)" testId="field-trees">
-                <Input type="number" value={treeAmount} onChange={(e) => setTreeAmount(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" />
-              </FieldRow>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <FieldRow label="Blok per Pohon" testId="field-blocks-rate">
-                   <Input type="number" step="0.1" value={avgBlocksPerTree} onChange={(e) => setAvgBlocksPerTree(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" />
-                </FieldRow>
-                <FieldRow label="Seed per Blok" testId="field-seeds-rate">
-                   <Input type="number" step="0.01" value={avgSeedsPerBlock} onChange={(e) => setAvgSeedsPerBlock(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" />
-                </FieldRow>
-              </div>
-              
-              <Separator className="bg-white/5" />
-              
-              <div className="grid grid-cols-3 gap-2">
-                <div className="glass rounded-xl p-3 text-center">
-                  <Pickaxe className="mx-auto mb-1 h-4 w-4 text-primary" />
-                  <div className="text-[10px] text-muted-foreground">Blok</div>
-                  <div className="font-display text-lg">{formatInt(farmingResult.totalBlocks)}</div>
-                </div>
-                <div className="glass rounded-xl p-3 text-center">
-                  <Box className="mx-auto mb-1 h-4 w-4 text-accent" />
-                  <div className="text-[10px] text-muted-foreground">Seed</div>
-                  <div className="font-display text-lg">{formatInt(farmingResult.totalSeeds)}</div>
-                </div>
-                <div className="glass rounded-xl p-3 text-center">
-                  <Sparkles className="mx-auto mb-1 h-4 w-4 text-yellow-400" />
-                  <div className="text-[10px] text-muted-foreground">Gems</div>
-                  <div className="font-display text-lg">{formatInt(farmingResult.gemsFromBlocks)}</div>
-                </div>
-              </div>
-            </div>
-          </Panel>
-
-          {/* Pack Rates Panel */}
-          <Panel
-            title="Pack & Gem Rates"
-            subtitle="Hitung berapa WL yang didapat dari Gems."
-            testId="panel-packs"
-          >
-             <div className="space-y-4">
-               <FieldRow label="Total Gems" testId="field-gems">
-                 <Input type="number" value={gemsAmount} onChange={(e) => setGemsAmount(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" />
-               </FieldRow>
-               <div className="grid gap-3 sm:grid-cols-2">
-                 <FieldRow label="Harga Pack (Gems)" testId="field-pack-price">
-                   <Input type="number" value={packPrice} onChange={(e) => setPackPrice(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" />
-                 </FieldRow>
-                 <FieldRow label="Rate Jual (Pack/WL)" hint="Misal: 10/1" testId="field-sell-rate">
-                   <Input type="number" value={sellRate} onChange={(e) => setSellRate(Number(e.target.value))} className="h-11 rounded-xl bg-black/20" />
-                 </FieldRow>
-               </div>
-
-               <div className="glass rounded-xl p-4 flex items-center justify-between bg-primary/5 border-primary/20">
-                 <div className="flex items-center gap-3">
-                   <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                     <TrendingUp className="h-5 w-5 text-primary" />
-                   </div>
-                   <div>
-                     <div className="text-xs text-muted-foreground">Total Packs</div>
-                     <div className="font-display text-xl">{formatInt(packResult.totalPacks)}</div>
-                   </div>
-                 </div>
-                 <ArrowRight className="text-muted-foreground h-4 w-4" />
-                 <div className="text-right">
-                   <div className="text-xs text-muted-foreground">Estimasi Hasil</div>
-                   <div className="font-display text-xl text-primary">{formatInt(packResult.wlReturn)} WL</div>
-                 </div>
-               </div>
-             </div>
-          </Panel>
-
-          {/* Quick Shortcuts / Info */}
-          <Panel
-            title="Info & Tips"
-            subtitle="Data referensi umum untuk pemain."
-            testId="panel-info"
-          >
-            <div className="space-y-3">
-              {[
-                { label: "1 BGL", val: "100 DL / 10.000 WL" },
-                { label: "SSP Pack", val: "2.000 Gems" },
-                { label: "RSP Pack", val: "5.000 Gems" },
-                { label: "Gemonade", val: "Gems x1.5 saat Harvest" },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-white/5 transition-colors">
-                  <span className="text-muted-foreground">{item.label}</span>
-                  <span className="font-display text-accent">{item.val}</span>
-                </div>
-              ))}
-              <div className="mt-4 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-[10px] text-yellow-200/70 leading-relaxed">
-                *Nilai di atas adalah estimasi. Keberuntungan (luck) dan buff seperti Clover/Gemonade sangat berpengaruh pada hasil harvest sebenarnya.
-              </div>
-            </div>
-          </Panel>
-        </div>
-
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-12 text-center text-xs text-muted-foreground"
-        >
-          <p>© 2026 GrowTool Hub. Terinspirasi dari komunitas Growtopia.</p>
-        </motion.footer>
-      </div>
-    </div>
-  );
-}
+</body>
+</html>
