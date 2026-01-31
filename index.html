@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Growtopia Calculator UI Test</title>
+  <title>Growtopia Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -11,57 +11,72 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar"
-    class="bg-slate-900 border-r border-slate-800 transition-all duration-300 ease-in-out
-           w-16 flex flex-col">
+    class="bg-slate-900 border-r border-slate-800 transition-all duration-300
+           w-14 flex flex-col">
 
-    <!-- LOGO -->
-    <button id="logoBtn"
-      class="h-16 flex items-center justify-center hover:bg-slate-800 transition">
-      <span class="text-green-400 font-bold text-xl">G</span>
+    <!-- TOGGLE -->
+    <button id="menuToggle"
+      class="h-14 flex items-center justify-center hover:bg-slate-800 transition">
+      <div class="space-y-1">
+        <span class="block w-5 h-0.5 bg-sky-400"></span>
+        <span class="block w-5 h-0.5 bg-sky-400"></span>
+        <span class="block w-5 h-0.5 bg-sky-400"></span>
+      </div>
     </button>
 
     <!-- MENU -->
-    <div id="menu" class="flex-1 px-2 space-y-1 mt-2 hidden">
-      <button data-page="tm"
-        class="menu-btn w-full flex items-center gap-3 px-3 py-2 rounded-md
-               hover:bg-slate-800 transition text-left">
-        <span class="text-green-400">■</span>
-        <span class="menu-text">TM Calculator</span>
+    <nav id="menu" class="flex-1 px-2 mt-3 space-y-1 hidden">
+      <button data-page="home" class="menu-btn w-full px-3 py-2 rounded-md text-left hover:bg-slate-800 transition">
+        Home
       </button>
-
-      <button data-page="cloud"
-        class="menu-btn w-full flex items-center gap-3 px-3 py-2 rounded-md
-               hover:bg-slate-800 transition text-left">
-        <span class="text-green-400">■</span>
-        <span class="menu-text">Clouds Massing</span>
+      <button data-page="tm" class="menu-btn w-full px-3 py-2 rounded-md text-left hover:bg-slate-800 transition">
+        TM Calculator
       </button>
-    </div>
+      <button data-page="cloud" class="menu-btn w-full px-3 py-2 rounded-md text-left hover:bg-slate-800 transition">
+        Clouds Massing
+      </button>
+    </nav>
   </aside>
 
   <!-- MAIN -->
-  <main class="flex-1 p-8 relative">
+  <main class="flex-1 p-8 relative overflow-y-auto">
 
-    <!-- TM PAGE -->
-    <section id="pageTM"
-      class="page transition-opacity duration-200">
-      <h1 class="text-2xl font-semibold mb-4">TM Calculator</h1>
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <p class="text-slate-400">
-          Ini halaman TM Calculator<br>
-          (nanti isi input & hitungan di sini)
-        </p>
+    <!-- HOME -->
+    <section id="pageHome" class="page transition-opacity duration-200">
+      <h1 class="text-3xl font-semibold mb-3">Growtopia Calculator</h1>
+      <p class="text-slate-400 max-w-xl mb-8">
+        Tool sederhana untuk menghitung kebutuhan TM dan Massing Clouds
+        secara cepat dan efisien.
+      </p>
+
+      <div class="flex gap-4">
+        <button id="goTM"
+          class="px-5 py-3 rounded-xl bg-sky-500/10 border border-sky-500/30
+                 hover:bg-sky-500/20 transition text-sky-400">
+          Buka TM Calculator
+        </button>
+
+        <button id="goCloud"
+          class="px-5 py-3 rounded-xl bg-sky-500/10 border border-sky-500/30
+                 hover:bg-sky-500/20 transition text-sky-400">
+          Buka Clouds Massing
+        </button>
       </div>
     </section>
 
-    <!-- CLOUD PAGE -->
-    <section id="pageCloud"
-      class="page hidden opacity-0 transition-opacity duration-200">
+    <!-- TM -->
+    <section id="pageTM" class="page hidden opacity-0 transition-opacity duration-200">
+      <h1 class="text-2xl font-semibold mb-4">TM Calculator</h1>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 text-slate-400">
+        (TM calculator nanti ditaruh di sini)
+      </div>
+    </section>
+
+    <!-- CLOUD -->
+    <section id="pageCloud" class="page hidden opacity-0 transition-opacity duration-200">
       <h1 class="text-2xl font-semibold mb-4">Clouds Massing</h1>
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <p class="text-slate-400">
-          Ini halaman Clouds Massing<br>
-          (nanti isi input & hitungan di sini)
-        </p>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 text-slate-400">
+        (Clouds calculator nanti ditaruh di sini)
       </div>
     </section>
 
@@ -69,59 +84,58 @@
 
 <script>
   const sidebar = document.getElementById('sidebar');
-  const logoBtn = document.getElementById('logoBtn');
+  const menuToggle = document.getElementById('menuToggle');
   const menu = document.getElementById('menu');
   const menuBtns = document.querySelectorAll('.menu-btn');
 
-  const pageTM = document.getElementById('pageTM');
-  const pageCloud = document.getElementById('pageCloud');
+  const pages = {
+    home: document.getElementById('pageHome'),
+    tm: document.getElementById('pageTM'),
+    cloud: document.getElementById('pageCloud')
+  };
+
+  const goTM = document.getElementById('goTM');
+  const goCloud = document.getElementById('goCloud');
 
   let sidebarOpen = false;
-  let activePage = 'tm';
+  let activePage = 'home';
 
-  // TOGGLE SIDEBAR
-  logoBtn.onclick = () => {
+  function switchPage(page) {
+    if (page === activePage) return;
+
+    menuBtns.forEach(b => b.classList.remove('bg-slate-800', 'text-sky-400'));
+    document.querySelector(`[data-page="${page}"]`)
+      ?.classList.add('bg-slate-800', 'text-sky-400');
+
+    pages[activePage].classList.add('opacity-0');
+    setTimeout(() => {
+      pages[activePage].classList.add('hidden');
+      pages[page].classList.remove('hidden');
+      requestAnimationFrame(() => pages[page].classList.remove('opacity-0'));
+      activePage = page;
+    }, 150);
+  }
+
+  menuToggle.onclick = () => {
     sidebarOpen = !sidebarOpen;
-
-    sidebar.classList.toggle('w-16', !sidebarOpen);
+    sidebar.classList.toggle('w-14', !sidebarOpen);
     sidebar.classList.toggle('w-52', sidebarOpen);
-
     menu.classList.toggle('hidden', !sidebarOpen);
   };
 
-  // SWITCH PAGE
   menuBtns.forEach(btn => {
-    btn.onclick = () => {
-      const page = btn.dataset.page;
-      if (page === activePage) return;
-
-      activePage = page;
-
-      // reset active style
-      menuBtns.forEach(b =>
-        b.classList.remove('bg-slate-800', 'border-l-2', 'border-green-400')
-      );
-
-      btn.classList.add('bg-slate-800', 'border-l-2', 'border-green-400');
-
-      // fade pages
-      if (page === 'tm') {
-        pageCloud.classList.add('opacity-0');
-        setTimeout(() => {
-          pageCloud.classList.add('hidden');
-          pageTM.classList.remove('hidden');
-          requestAnimationFrame(() => pageTM.classList.remove('opacity-0'));
-        }, 150);
-      } else {
-        pageTM.classList.add('opacity-0');
-        setTimeout(() => {
-          pageTM.classList.add('hidden');
-          pageCloud.classList.remove('hidden');
-          requestAnimationFrame(() => pageCloud.classList.remove('opacity-0'));
-        }, 150);
-      }
-    };
+    btn.onclick = () => switchPage(btn.dataset.page);
   });
+
+  goTM.onclick = () => {
+    if (!sidebarOpen) menuToggle.click();
+    switchPage('tm');
+  };
+
+  goCloud.onclick = () => {
+    if (!sidebarOpen) menuToggle.click();
+    switchPage('cloud');
+  };
 </script>
 
 </body>
