@@ -1,60 +1,57 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Growtopia Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-indigo-50 to-sky-100 flex justify-center p-6">
+<body class="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900 text-white flex justify-center p-6">
   <div class="w-full max-w-xl space-y-6">
 
-    <!-- TITLE -->
+    <!-- HEADER -->
     <h1 class="text-3xl font-bold text-center">Growtopia Calculator</h1>
 
-    <!-- NAV -->
-    <div class="flex justify-center gap-2">
-      <button id="btnTM" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium">
+    <!-- HOME -->
+    <div id="pageHome" class="bg-slate-700/60 rounded-2xl p-6 space-y-4">
+      <h2 class="text-xl font-semibold text-center">Menu</h2>
+      <button onclick="openTM()" class="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-600 font-medium">
         TM Calculator
       </button>
-      <button id="btnCloud" class="px-4 py-2 rounded-xl bg-white border text-sm font-medium">
+      <button onclick="openCloud()" class="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 font-medium">
         Clouds Massing
       </button>
     </div>
 
     <!-- TM PAGE -->
-    <div id="pageTM" class="bg-white rounded-2xl shadow p-6 space-y-4">
+    <div id="pageTM" class="hidden bg-slate-700/60 rounded-2xl p-6 space-y-4">
       <h2 class="text-xl font-semibold">Tesseract Manipulator</h2>
 
-      <div>
-        <label class="text-sm">Jumlah Block yang di-break</label>
-        <input id="blocks" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="contoh: 5000">
-      </div>
+      <input id="blocks" type="number" placeholder="Jumlah block di-break"
+        class="w-full rounded-xl px-4 py-2 text-black">
 
-      <div>
-        <label class="text-sm">Hit per 1 Block</label>
-        <input id="hitsPerBlock" type="number" value="3" class="w-full rounded-xl border px-4 py-2">
-      </div>
+      <input id="hitsPerBlock" type="number" value="3"
+        class="w-full rounded-xl px-4 py-2 text-black">
 
-      <div>
-        <label class="text-sm">Jumlah TM</label>
-        <input id="tmCount" type="number" min="1" value="1" class="w-full rounded-xl border px-4 py-2">
-      </div>
+      <input id="tmCount" type="number" min="1" value="1"
+        class="w-full rounded-xl px-4 py-2 text-black">
+
+      <button onclick="goHome()" class="text-sm text-sky-300 underline">← Kembali ke Home</button>
     </div>
 
     <!-- CLOUD PAGE -->
-    <div id="pageCloud" class="bg-white rounded-2xl shadow p-6 space-y-4 hidden">
-      <h2 class="text-xl font-semibold">Target Massing Clouds</h2>
+    <div id="pageCloud" class="hidden bg-slate-700/60 rounded-2xl p-6 space-y-4">
+      <h2 class="text-xl font-semibold">Clouds Massing</h2>
 
-      <div>
-        <label class="text-sm">Target Clouds Tree</label>
-        <input id="targetClouds" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="contoh: 200">
-      </div>
+      <input id="targetClouds" type="number" placeholder="Target Clouds Tree"
+        class="w-full rounded-xl px-4 py-2 text-black">
+
+      <button onclick="goHome()" class="text-sm text-sky-300 underline">← Kembali ke Home</button>
     </div>
 
-    <!-- RESULT (SATU-SATUNYA) -->
-    <div class="bg-white rounded-2xl shadow p-6 space-y-3">
+    <!-- RESULT -->
+    <div class="bg-slate-700/60 rounded-2xl p-6 space-y-2">
       <h2 class="text-xl font-semibold">Hasil Perhitungan</h2>
       <div class="flex justify-between"><span>Total Hit</span><b id="rHits">0</b></div>
       <div class="flex justify-between"><span>Gems Terpakai</span><b id="rGems">0</b></div>
@@ -62,23 +59,23 @@
       <div class="flex justify-between"><span>Modal TM</span><b id="rWL">0</b></div>
     </div>
 
-    <div class="text-center">
-      <button id="resetBtn" class="px-6 py-2 bg-rose-500 text-white rounded-xl hover:bg-rose-600">
-        Reset All
-      </button>
-    </div>
+    <button id="resetBtn" class="w-full py-2 rounded-xl bg-rose-500 hover:bg-rose-600">
+      Reset All
+    </button>
 
-    <p class="text-center text-sm text-slate-600">
-      Harga gems 200/WL • 1 hit = 1 gem • 1 hit = 1.5 detik
+    <p class="text-center text-sm text-slate-300">
+      200 gems / WL • 1 hit = 1 gem • 1 hit = 1.5 detik
     </p>
   </div>
 
 <script>
+  // KONSTANTA (ASLI)
   const GEM_PER_HIT = 1;
   const TIME_PER_HIT = 1.5;
   const GEM_PER_WL = 200;
   const CLOUDSTONE_SEED_PER_200 = 145;
 
+  // ELEMENT
   const blocks = document.getElementById('blocks');
   const hitsPerBlock = document.getElementById('hitsPerBlock');
   const tmCount = document.getElementById('tmCount');
@@ -89,72 +86,14 @@
   const rTime = document.getElementById('rTime');
   const rWL = document.getElementById('rWL');
 
+  const pageHome = document.getElementById('pageHome');
   const pageTM = document.getElementById('pageTM');
   const pageCloud = document.getElementById('pageCloud');
-  const btnTM = document.getElementById('btnTM');
-  const btnCloud = document.getElementById('btnCloud');
-  const resetBtn = document.getElementById('resetBtn');
 
+  // FORMAT
   const formatK = n => n >= 1000 ? (Math.round(n / 100) / 10) + 'k' : n;
   const formatWL = n => n < 1 ? n.toFixed(3) : n.toFixed(2);
 
-  btnTM.onclick = () => {
-    pageTM.classList.remove('hidden');
-    pageCloud.classList.add('hidden');
-    btnTM.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium';
-    btnCloud.className = 'px-4 py-2 rounded-xl bg-white border text-sm font-medium';
-    updateTM();
-  };
-
-  btnCloud.onclick = () => {
-    pageCloud.classList.remove('hidden');
-    pageTM.classList.add('hidden');
-    btnCloud.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium';
-    btnTM.className = 'px-4 py-2 rounded-xl bg-white border text-sm font-medium';
-    updateCloud();
-  };
-
-  function updateTM() {
-    const hits = (blocks.value || 0) * (hitsPerBlock.value || 0);
-    const gems = hits * GEM_PER_HIT;
-    const wl = gems / GEM_PER_WL;
-    const time = (hits * TIME_PER_HIT) / Math.max(1, tmCount.value || 1);
-
-    rHits.textContent = formatK(hits);
-    rGems.textContent = formatK(gems) + ' gems';
-    rWL.textContent = formatWL(wl) + ' WL';
-    rTime.textContent = Math.floor(time / 3600) + ' jam ' +
-                        Math.floor(time % 3600 / 60) + ' menit';
-  }
-
-  function updateCloud() {
-    const t = targetClouds.value || 0;
-    if (t <= 0) return;
-
-    const tree = Math.ceil((t / CLOUDSTONE_SEED_PER_200) * 200);
-    const blocks = tree * 4;
-    const hits = blocks * (hitsPerBlock.value || 3);
-    const gems = hits * GEM_PER_HIT;
-    const wl = gems / GEM_PER_WL;
-
-    rHits.textContent = formatK(hits);
-    rGems.textContent = formatK(gems) + ' gems';
-    rWL.textContent = formatWL(wl) + ' WL';
-    rTime.textContent = '0';
-  }
-
-  resetBtn.onclick = () => {
-    blocks.value = '';
-    hitsPerBlock.value = 3;
-    tmCount.value = 1;
-    targetClouds.value = '';
-    rHits.textContent = rGems.textContent = rWL.textContent = rTime.textContent = 0;
-  };
-
-  blocks.oninput = updateTM;
-  hitsPerBlock.oninput = () => { updateTM(); updateCloud(); };
-  tmCount.oninput = updateTM;
-  targetClouds.oninput = updateCloud;
-</script>
-</body>
-</html>
+  // NAV
+  function openTM() {
+    pageHome.classList.add('hid
